@@ -6,14 +6,14 @@ const checkAttempts = (req, res, next) => {
     const email = data.email;
     if(otpCache.has(email)) {
         const otpData = otpCache.get(email);
-        if(otpData.attempts >= 3) {
+        if(otpData.attempts >= Number(process.env.ATTEMPT_LIMIT)) {
             otpCache.delete(email);
-            res.status(429).json({ message: "Too many attempts! Please try again later." });
+            return res.status(429).json({ message: "Too many attempts! Please try again later." });
         } else {
             next();
         }
     }else{
-        res.status(400).json({ message: "Invalid OTP or session expired." });
+        return res.status(400).json({ message: "Invalid OTP or session expired." });
     }
 }
 
