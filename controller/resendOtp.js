@@ -1,6 +1,7 @@
 import { otpCache } from "../config/db.js";
 import crypto from "crypto";
 import {hashOTP} from "../utils/hashOtp.js"
+import sendMail from "../utils/sendMail.js";
 
 const resendOtp = (req, res) => {
     const data = req.body;
@@ -39,8 +40,13 @@ const resendOtp = (req, res) => {
             "totalResends": otpData.totalResends + 1
         });
 
+        sendMail(email, otp).catch((err) => {
+            console.error("Error sending OTP email:", err);
+            return res.status(500).json({ error: "Failed to send OTP email" });
+        });
+
         // Debugging statement
-        if(process.env.ENVIORNMENT == "development"){
+        if(process.env.ENVIRONMENT == "development"){
             console.log(`Generated OTP: ${otp}`);
             return res.send({
                 "sucess": true,
