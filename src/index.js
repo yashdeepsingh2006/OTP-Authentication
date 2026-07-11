@@ -1,13 +1,11 @@
 import express from "express";
-import crypto from "crypto";
 import dotenv from "dotenv";
-import { otpCache } from "../config/db.js";
-import createOTP from "../controller/createOtp.js";
-import verifyOtp from "../controller/verifyOtp.js";
-import checkResends from "../middlewares/checkResends.js";
-import checkAttempts from "../middlewares/checkAttempts.js";
-import listOtp from "../controller/listOtp.js";
-import resendOtp from "../controller/resendOtp.js";
+import createOTP from "../src/controller/createOtp.js";
+import verifyOtp from "../src/controller/verifyOtp.js";
+import checkResends from "../src/middlewares/checkResends.js";
+import checkAttempts from "../src/middlewares/checkAttempts.js";
+import listOtp from "../src/controller/listOtp.js";
+import resendOtp from "../src/controller/resendOtp.js";
 
 dotenv.config();
 const app = express();
@@ -27,8 +25,11 @@ app.post("/otp/verify", checkAttempts, verifyOtp);
 app.post("/otp/resend", checkResends, resendOtp);
 
 // List all OTPs (for testing purposes)
-app.get("/otp/list", listOtp);
+if(process.env.ENVIRONMENT === "development") {
+  app.get("/otp/list", listOtp);
+}
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server is running on http://localhost:${process.env.PORT}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
